@@ -90,17 +90,7 @@
                 "description": "Switch to enable or disable High Availability for MySQL/PostgresSql. Only applicable when Flexible Server is used for DB."
             }
         },
-        "azureFrontDoorSkuName": {
-            "type": "string",
-            "defaultValue": "Standard_AzureFrontDoor",
-            "allowedValues": [
-                "Standard_AzureFrontDoor",
-                "Premium_AzureFrontDoor"
-            ],
-            "metadata": {
-                "description": "Name of the SKU to be used for Azure Front Door."
-            }
-        },
+        
         "httpsTermination": {
             "allowedValues": [
                 "AzureFrontDoor",
@@ -639,7 +629,7 @@
               "description": "The name of the Front Door endpoint to create. This must be globally unique."
             }
           },
-          "skuName": {
+          "azureFrontDoorSkuName": {
             "type": "string",
             "defaultValue": "Standard_AzureFrontDoor",
             "allowedValues": [
@@ -678,7 +668,7 @@
             "name": "[variables('profileName')]",
             "location": "global",
             "sku": {
-              "name": "[parameters('skuName')]"
+              "name": "[parameters('azureFrontDoorSkuName')]"
             }
           },
           {
