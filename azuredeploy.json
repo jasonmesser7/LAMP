@@ -90,7 +90,7 @@
                 "description": "Switch to enable or disable High Availability for MySQL/PostgresSql. Only applicable when Flexible Server is used for DB."
             }
         },
-        
+
         "httpsTermination": {
             "allowedValues": [
                 "AzureFrontDoor",
@@ -681,7 +681,8 @@
               "enabledState": "Enabled"
             },
             "dependsOn": [
-              "[resourceId('Microsoft.Cdn/profiles', variables('profileName'))]"
+              "[resourceId('Microsoft.Cdn/profiles', variables('profileName'))]",
+              "Microsoft.Resources/deployments/networkTemplate"
             ]
           },
           {
@@ -701,7 +702,8 @@
               }
             },
             "dependsOn": [
-              "[resourceId('Microsoft.Cdn/profiles', variables('profileName'))]"
+              "[resourceId('Microsoft.Cdn/profiles', variables('profileName'))]",
+              "Microsoft.Resources/deployments/networkTemplate"
             ]
           },
           {
@@ -709,16 +711,17 @@
             "apiVersion": "2020-09-01",
             "name": "[format('{0}/{1}/{2}', variables('profileName'), variables('originGroupName'), variables('originName'))]",
             "properties": {
-              "hostName": "[parameters('originHostName')]",
+              "hostName": "[reference('networkTemplate').outputs.lbPubIp.value]",
               "httpPort": 80,
               "httpsPort": 443,
-              "originHostHeader": "[parameters('originHostName')]",
+              "originHostHeader": "[reference('networkTemplate').outputs.lbPubIp.value]",
               "priority": 1,
               "weight": 1000
             },
             "dependsOn": [
               "[resourceId('Microsoft.Cdn/profiles/originGroups', variables('profileName'), variables('originGroupName'))]",
-              "[resourceId('Microsoft.Cdn/profiles', variables('profileName'))]"
+              "[resourceId('Microsoft.Cdn/profiles', variables('profileName'))]",
+              "Microsoft.Resources/deployments/networkTemplate"
             ]
           },
           {
