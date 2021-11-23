@@ -639,12 +639,6 @@
             "metadata": {
               "description": "The name of the SKU to use when creating the Front Door profile."
             }
-          },
-          "originHostName": {
-            "type": "string",
-            "metadata": {
-              "description": "The host name that should be used when connecting from Front Door to the origin."
-            }
           }
     },
     "resources": [
