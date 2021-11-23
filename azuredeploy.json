@@ -651,7 +651,7 @@
             "dependsOn": [
                 "Microsoft.Resources/deployments/networkTemplate"
             ],
-            "name": "[concat(myLampFrontDoor, variables('resourceprefix'))]",
+            "name": "[concat('myLampFrontDoor', variables('resourceprefix'))]",
             "location": "global",
             "properties": {
               "routingRules": [
