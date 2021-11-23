@@ -659,7 +659,7 @@
         {
             "type": "Microsoft.Cdn/profiles",
             "apiVersion": "2020-09-01",
-            "name": "[variables('profileName')]",
+            "name": "[variables('lampCommon').profileName]",
             "location": "global",
             "sku": {
               "name": "[parameters('azureFrontDoorSkuName')]"
@@ -668,21 +668,21 @@
           {
             "type": "Microsoft.Cdn/profiles/afdEndpoints",
             "apiVersion": "2020-09-01",
-            "name": "[format('{0}/{1}', variables('profileName'), parameters('endpointName'))]",
+            "name": "[format('{0}/{1}', [variables('lampCommon').profileName], parameters('endpointName'))]",
             "location": "global",
             "properties": {
               "originResponseTimeoutSeconds": 240,
               "enabledState": "Enabled"
             },
             "dependsOn": [
-              "[resourceId('Microsoft.Cdn/profiles', variables('profileName'))]",
+              "[resourceId('Microsoft.Cdn/profiles', [variables('lampCommon').profileName])]",
               "Microsoft.Resources/deployments/networkTemplate"
             ]
           },
           {
             "type": "Microsoft.Cdn/profiles/originGroups",
             "apiVersion": "2020-09-01",
-            "name": "[format('{0}/{1}', variables('profileName'), variables('originGroupName'))]",
+            "name": "[format('{0}/{1}', [variables('lampCommon').profileName], variables('originGroupName'))]",
             "properties": {
               "loadBalancingSettings": {
                 "sampleSize": 4,
@@ -696,14 +696,14 @@
               }
             },
             "dependsOn": [
-              "[resourceId('Microsoft.Cdn/profiles', variables('profileName'))]",
+              "[resourceId('Microsoft.Cdn/profiles', [variables('lampCommon').profileName])]",
               "Microsoft.Resources/deployments/networkTemplate"
             ]
           },
           {
             "type": "Microsoft.Cdn/profiles/originGroups/origins",
             "apiVersion": "2020-09-01",
-            "name": "[format('{0}/{1}/{2}', variables('profileName'), variables('originGroupName'), variables('originName'))]",
+            "name": "[format('{0}/{1}/{2}', [variables('lampCommon').profileName], variables('originGroupName'), variables('originName'))]",
             "properties": {
               "hostName": "[reference('networkTemplate').outputs.lbPubIp.value]",
               "httpPort": 80,
@@ -713,18 +713,18 @@
               "weight": 1000
             },
             "dependsOn": [
-              "[resourceId('Microsoft.Cdn/profiles/originGroups', variables('profileName'), variables('originGroupName'))]",
-              "[resourceId('Microsoft.Cdn/profiles', variables('profileName'))]",
+              "[resourceId('Microsoft.Cdn/profiles/originGroups', [variables('lampCommon').profileName], variables('originGroupName'))]",
+              "[resourceId('Microsoft.Cdn/profiles', [variables('lampCommon').profileName])]",
               "Microsoft.Resources/deployments/networkTemplate"
             ]
           },
           {
             "type": "Microsoft.Cdn/profiles/afdEndpoints/routes",
             "apiVersion": "2020-09-01",
-            "name": "[format('{0}/{1}/{2}', variables('profileName'), parameters('endpointName'), variables('routeName'))]",
+            "name": "[format('{0}/{1}/{2}', [variables('lampCommon').profileName], parameters('endpointName'), variables('routeName'))]",
             "properties": {
               "originGroup": {
-                "id": "[resourceId('Microsoft.Cdn/profiles/originGroups', variables('profileName'), variables('originGroupName'))]"
+                "id": "[resourceId('Microsoft.Cdn/profiles/originGroups', [variables('lampCommon').profileName], variables('originGroupName'))]"
               },
               "supportedProtocols": [
                 "Http",
