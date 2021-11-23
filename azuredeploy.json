@@ -651,7 +651,7 @@
             "dependsOn": [
                 "Microsoft.Resources/deployments/networkTemplate"
             ],
-            "name": "myLampFrontDoor",
+            "name": "[concat(myLampFrontDoor, variables('resourceprefix'))]",
             "location": "global",
             "properties": {
               "routingRules": [
@@ -660,7 +660,7 @@
                   "properties": {
                     "frontendEndpoints": [
                       {
-                        "id": "[resourceId('Microsoft.Network/frontDoors/frontendEndpoints', 'myLampFrontDoor', 'frontendEndpoint1')]"
+                        "id": "[resourceId('Microsoft.Network/frontDoors/frontendEndpoints', '[concat(myLampFrontDoor, variables('resourceprefix'))]', 'frontendEndpoint1')]"
                       }
                     ],
                     "acceptedProtocols": [
@@ -674,7 +674,7 @@
                       "@odata.type": "#Microsoft.Azure.FrontDoor.Models.FrontdoorForwardingConfiguration",
                       "forwardingProtocol": "MatchRequest",
                       "backendPool": {
-                        "id": "[resourceId('Microsoft.Network/frontDoors/backendPools', 'myLampFrontDoor', 'backendPool1')]"
+                        "id": "[resourceId('Microsoft.Network/frontDoors/backendPools', '[concat(myLampFrontDoor, variables('resourceprefix'))]', 'backendPool1')]"
                       }
                     },
                     "enabledState": "Enabled"
@@ -716,10 +716,10 @@
                       }
                     ],
                     "loadBalancingSettings": {
-                      "id": "[resourceId('Microsoft.Network/frontDoors/loadBalancingSettings', 'myLampFrontDoor', 'loadBalancingSettings1')]"
+                      "id": "[resourceId('Microsoft.Network/frontDoors/loadBalancingSettings', '[concat(myLampFrontDoor, variables('resourceprefix'))]', 'loadBalancingSettings1')]"
                     },
                     "healthProbeSettings": {
-                      "id": "[resourceId('Microsoft.Network/frontDoors/healthProbeSettings', 'myLampFrontDoor', 'healthProbeSettings1')]"
+                      "id": "[resourceId('Microsoft.Network/frontDoors/healthProbeSettings', '[concat(myLampFrontDoor, variables('resourceprefix'))]', 'healthProbeSettings1')]"
                     }
                   }
                 }
@@ -728,7 +728,7 @@
                 {
                   "name": "frontendEndpoint1",
                   "properties": {
-                    "hostName": "[concat('myLampFrontDoor', '.azurefd.net')]",
+                    "hostName": "[concat('[concat(myLampFrontDoor, variables('resourceprefix'))]', '.azurefd.net')]",
                     "sessionAffinityEnabledState": "Disabled"
                   }
                 }
