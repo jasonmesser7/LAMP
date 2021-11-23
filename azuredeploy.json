@@ -628,17 +628,6 @@
             "metadata": {
               "description": "The name of the Front Door endpoint to create. This must be globally unique."
             }
-          },
-          "azureFrontDoorSkuName": {
-            "type": "string",
-            "defaultValue": "Standard_AzureFrontDoor",
-            "allowedValues": [
-              "Standard_AzureFrontDoor",
-              "Premium_AzureFrontDoor"
-            ],
-            "metadata": {
-              "description": "The name of the SKU to use when creating the Front Door profile."
-            }
           }
     },
     "resources": [
@@ -657,140 +646,96 @@
         },
 
         {
-            "type": "Microsoft.Cdn/profiles",
-            "apiVersion": "2020-09-01",
-            "name": "[variables('lampCommon').profileName]",
+            "type": "Microsoft.Network/frontDoors",
+            "apiVersion": "2020-07-01",
+            "dependsOn": [
+                "Microsoft.Resources/deployments/networkTemplate"
+            ],
+            "name": "myLampFrontDoor",
             "location": "global",
-            "sku": {
-              "name": "[parameters('azureFrontDoorSkuName')]"
+            "properties": {
+              "routingRules": [
+                {
+                  "name": "routingRule1",
+                  "properties": {
+                    "frontendEndpoints": [
+                      {
+                        "id": "[resourceId('Microsoft.Network/frontDoors/frontendEndpoints', 'myLampFrontDoor', 'frontendEndpoint1')]"
+                      }
+                    ],
+                    "acceptedProtocols": [
+                      "Http",
+                      "Https"
+                    ],
+                    "patternsToMatch": [
+                      "/*"
+                    ],
+                    "routeConfiguration": {
+                      "@odata.type": "#Microsoft.Azure.FrontDoor.Models.FrontdoorForwardingConfiguration",
+                      "forwardingProtocol": "MatchRequest",
+                      "backendPool": {
+                        "id": "[resourceId('Microsoft.Network/frontDoors/backendPools', 'myLampFrontDoor', 'backendPool1')]"
+                      }
+                    },
+                    "enabledState": "Enabled"
+                  }
+                }
+              ],
+              "healthProbeSettings": [
+                {
+                  "name": "healthProbeSettings1",
+                  "properties": {
+                    "path": "/",
+                    "protocol": "Http",
+                    "intervalInSeconds": 120
+                  }
+                }
+              ],
+              "loadBalancingSettings": [
+                {
+                  "name": "loadBalancingSettings1",
+                  "properties": {
+                    "sampleSize": 4,
+                    "successfulSamplesRequired": 2
+                  }
+                }
+              ],
+              "backendPools": [
+                {
+                  "name": "backendPool1",
+                  "properties": {
+                    "backends": [
+                      {
+                        "address": "[reference('networkTemplate').outputs.lbPubIp.value]",
+                        "backendHostHeader": "[reference('networkTemplate').outputs.lbPubIp.value]",
+                        "httpPort": 80,
+                        "httpsPort": 443,
+                        "weight": 50,
+                        "priority": 1,
+                        "enabledState": "Enabled"
+                      }
+                    ],
+                    "loadBalancingSettings": {
+                      "id": "[resourceId('Microsoft.Network/frontDoors/loadBalancingSettings', 'myLampFrontDoor', 'loadBalancingSettings1')]"
+                    },
+                    "healthProbeSettings": {
+                      "id": "[resourceId('Microsoft.Network/frontDoors/healthProbeSettings', 'myLampFrontDoor', 'healthProbeSettings1')]"
+                    }
+                  }
+                }
+              ],
+              "frontendEndpoints": [
+                {
+                  "name": "frontendEndpoint1",
+                  "properties": {
+                    "hostName": "[concat('myLampFrontDoor', '.azurefd.net')]",
+                    "sessionAffinityEnabledState": "Disabled"
+                  }
+                }
+              ],
+              "enabledState": "Enabled"
             }
           },
-          {
-            "type": "Microsoft.Cdn/profiles/afdEndpoints",
-            "apiVersion": "2020-09-01",
-            "name": "[format('{0}/{1}', [variables('lampCommon').profileName], parameters('endpointName'))]",
-            "location": "global",
-            "properties": {
-              "originResponseTimeoutSeconds": 240,
-              "enabledState": "Enabled"
-            },
-            "dependsOn": [
-              "[resourceId('Microsoft.Cdn/profiles', [variables('lampCommon').profileName])]",
-              "Microsoft.Resources/deployments/networkTemplate"
-            ]
-          },
-          {
-            "type": "Microsoft.Cdn/profiles/originGroups",
-            "apiVersion": "2020-09-01",
-            "name": "[format('{0}/{1}', [variables('lampCommon').profileName], variables('originGroupName'))]",
-            "properties": {
-              "loadBalancingSettings": {
-                "sampleSize": 4,
-                "successfulSamplesRequired": 3
-              },
-              "healthProbeSettings": {
-                "probePath": "/",
-                "probeRequestType": "HEAD",
-                "probeProtocol": "Http",
-                "probeIntervalInSeconds": 100
-              }
-            },
-            "dependsOn": [
-              "[resourceId('Microsoft.Cdn/profiles', [variables('lampCommon').profileName])]",
-              "Microsoft.Resources/deployments/networkTemplate"
-            ]
-          },
-          {
-            "type": "Microsoft.Cdn/profiles/originGroups/origins",
-            "apiVersion": "2020-09-01",
-            "name": "[format('{0}/{1}/{2}', [variables('lampCommon').profileName], variables('originGroupName'), variables('originName'))]",
-            "properties": {
-              "hostName": "[reference('networkTemplate').outputs.lbPubIp.value]",
-              "httpPort": 80,
-              "httpsPort": 443,
-              "originHostHeader": "[reference('networkTemplate').outputs.lbPubIp.value]",
-              "priority": 1,
-              "weight": 1000
-            },
-            "dependsOn": [
-              "[resourceId('Microsoft.Cdn/profiles/originGroups', [variables('lampCommon').profileName], variables('originGroupName'))]",
-              "[resourceId('Microsoft.Cdn/profiles', [variables('lampCommon').profileName])]",
-              "Microsoft.Resources/deployments/networkTemplate"
-            ]
-          },
-          {
-            "type": "Microsoft.Cdn/profiles/afdEndpoints/routes",
-            "apiVersion": "2020-09-01",
-            "name": "[format('{0}/{1}/{2}', [variables('lampCommon').profileName], parameters('endpointName'), variables('routeName'))]",
-            "properties": {
-              "originGroup": {
-                "id": "[resourceId('Microsoft.Cdn/profiles/originGroups', [variables('lampCommon').profileName], variables('originGroupName'))]"
-              },
-              "supportedProtocols": [
-                "Http",
-                "Https"
-              ],
-              "patternsToMatch": [
-                "/*"
-              ],
-              "compressionSettings": {
-                "contentTypesToCompress": [
-                  "application/eot",
-                  "application/font",
-                  "application/font-sfnt",
-                  "application/javascript",
-                  "application/json",
-                  "application/opentype",
-                  "application/otf",
-                  "application/pkcs7-mime",
-                  "application/truetype",
-                  "application/ttf",
-                  "application/vnd.ms-fontobject",
-                  "application/xhtml+xml",
-                  "application/xml",
-                  "application/xml+rss",
-                  "application/x-font-opentype",
-                  "application/x-font-truetype",
-                  "application/x-font-ttf",
-                  "application/x-httpd-cgi",
-                  "application/x-javascript",
-                  "application/x-mpegurl",
-                  "application/x-opentype",
-                  "application/x-otf",
-                  "application/x-perl",
-                  "application/x-ttf",
-                  "font/eot",
-                  "font/ttf",
-                  "font/otf",
-                  "font/opentype",
-                  "image/svg+xml",
-                  "text/css",
-                  "text/csv",
-                  "text/html",
-                  "text/javascript",
-                  "text/js",
-                  "text/plain",
-                  "text/richtext",
-                  "text/tab-separated-values",
-                  "text/xml",
-                  "text/x-script",
-                  "text/x-component",
-                  "text/x-java-source"
-                ],
-                "isCompressionEnabled": true
-              },
-              "queryStringCachingBehavior": "IgnoreQueryString",
-              "forwardingProtocol": "HttpsOnly",
-              "linkToDefaultDomain": "Enabled",
-              "httpsRedirect": "Enabled"
-            },
-            "dependsOn": [
-              "[resourceId('Microsoft.Cdn/profiles/afdEndpoints', variables('profileName'), parameters('endpointName'))]",
-              "[resourceId('Microsoft.Cdn/profiles/originGroups/origins', variables('profileName'), variables('originGroupName'), variables('originName'))]",
-              "[resourceId('Microsoft.Cdn/profiles/originGroups', variables('profileName'), variables('originGroupName'))]",
-              "[resourceId('Microsoft.Cdn/profiles', variables('profileName'))]"
-            ]
-        },
 
         {
             "type": "Microsoft.Resources/deployments",
@@ -1159,7 +1104,6 @@
             "autoscaleVmSku": "[parameters('autoscaleVmSku')]",
             "azureBackupSwitch": "[parameters('azureBackupSwitch')]",
             "azureFrontDoorSwitch": "[parameters('azureFrontDoorSwitch')]",
-            "azureFrontDoorSkuName": "[parameters('azureFrontDoorSkuName')]",
             "commonFunctionsScriptUri": "[concat(parameters('_artifactsLocation'),'scripts/helper_functions.sh',parameters('_artifactsLocationSasToken'))]",
             "controllerVmSku": "[parameters('controllerVmSku')]",
             "customVnetId": "[parameters('customVnetId')]",
