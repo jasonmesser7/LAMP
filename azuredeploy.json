@@ -660,7 +660,7 @@
                   "properties": {
                     "frontendEndpoints": [
                       {
-                        "id": "[resourceId('Microsoft.Network/frontDoors/frontendEndpoints', [concat('myLampFrontDoor, variables('resourceprefix'))]', 'frontendEndpoint1')]"
+                        "id": "[resourceId('Microsoft.Network/frontDoors/frontendEndpoints', [concat('myLampFrontDoor', variables('resourceprefix'))], 'frontendEndpoint1')]"
                       }
                     ],
                     "acceptedProtocols": [
