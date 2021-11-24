@@ -672,7 +672,7 @@
                     ],
                     "routeConfiguration": {
                       "@odata.type": "#Microsoft.Azure.FrontDoor.Models.FrontdoorForwardingConfiguration",
-                      "forwardingProtocol": "Http",
+                      "forwardingProtocol": "HttpOnly",
                       "backendPool": {
                         "id": "[resourceId('Microsoft.Network/frontDoors/backendPools', variables('lampCommon').myLampFrontDoor, 'backendPool1')]"
                       }
