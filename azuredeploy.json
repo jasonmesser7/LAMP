@@ -604,9 +604,10 @@
         },
         "wordpressVersion": {
             "allowedValues": [
-                "5.8.3",
+                "5.4.1",
                 "5.4.2",
-                "5.4"
+                "5.4",
+                "5.8.3"
             ],
             "defaultValue": "5.8.3",
             "metadata": {
