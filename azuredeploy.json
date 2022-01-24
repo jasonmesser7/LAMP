@@ -604,11 +604,11 @@
         },
         "wordpressVersion": {
             "allowedValues": [
-                "5.4.1",
+                "5.8.3",
                 "5.4.2",
                 "5.4"
             ],
-            "defaultValue": "5.4.2",
+            "defaultValue": "5.8.3",
             "metadata": {
                 "description": "Select the CMS wordpress application version to be installed."
             },
