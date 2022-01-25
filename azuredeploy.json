@@ -657,7 +657,7 @@
             "properties": {
               "routingRules": [
                 {
-                  "name": "routingRule1", 
+                  "name": "route-to-pubIP", 
                   "properties": {
                     "frontendEndpoints": [
                       {
@@ -665,7 +665,6 @@
                       }
                     ],
                     "acceptedProtocols": [
-                      "Http",
                       "Https"
                     ],
                     "patternsToMatch": [
@@ -680,7 +679,33 @@
                     },
                     "enabledState": "Enabled"
                   }
+                },
+
+
+                 {
+                  "name": "HTTP-to-HTTPS-redirect", 
+                  "properties": {
+                    "frontendEndpoints": [
+                      {
+                        "id": "[resourceId('Microsoft.Network/frontDoors/frontendEndpoints', variables('lampCommon').myLampFrontDoor, 'frontendEndpoint1')]"
+                      }
+                    ],
+                    "acceptedProtocols": [
+                      "Http"
+                    ],
+                    "patternsToMatch": [
+                      "/*"
+                    ],
+                    "routeConfiguration": {
+                      "@odata.type": "#Microsoft.Azure.FrontDoor.Models.FrontdoorRedirectConfiguration",
+                      "redirectProtocoll": "HttpsOnly",
+                      "redirectType": "Found"
+                      
+                    },
+                    "enabledState": "Enabled"
+                  }
                 }
+
               ],
               "healthProbeSettings": [
                 {
@@ -708,8 +733,8 @@
                   "properties": {
                     "backends": [
                       {
-                        "address": "[variables('lampCommon').siteURL]",
-                        "backendHostHeader": "[variables('lampCommon').siteURL]",
+                        "address": "[reference('networkTemplate').outputs.lbPubIp.value]",
+                        "backendHostHeader": "[reference('networkTemplate').outputs.lbPubIp.value]",
                         "httpPort": 80,
                         "httpsPort": 443,
                         "weight": 50,
