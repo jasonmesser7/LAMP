@@ -688,7 +688,8 @@
                   "properties": {
                     "path": "/",
                     "protocol": "Http",
-                    "intervalInSeconds": 120
+                    "healthProbeMethod": "HEAD",
+                    "intervalInSeconds": 75
                   }
                 }
               ],
@@ -707,8 +708,8 @@
                   "properties": {
                     "backends": [
                       {
-                        "address": "[reference('networkTemplate').outputs.lbPubIp.value]",
-                        "backendHostHeader": "[reference('networkTemplate').outputs.lbPubIp.value]",
+                        "address": "[variables('lampCommon').siteURL]",
+                        "backendHostHeader": "[variables('lampCommon').siteURL]",
                         "httpPort": 80,
                         "httpsPort": 443,
                         "weight": 50,
@@ -736,7 +737,7 @@
               ],
               "enabledState": "Enabled"
             }
-          },
+        },
 
         {
             "type": "Microsoft.Resources/deployments",
