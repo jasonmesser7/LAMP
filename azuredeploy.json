@@ -655,7 +655,7 @@
             "name": "[concat('myLampFrontDoor', variables('resourceprefix'))]",
             "location": "global",
             "properties": {
-              "routingRules": [
+              "routingRules": [  
                 {
                   "name": "route-to-pubIP", 
                   "properties": {
@@ -698,7 +698,7 @@
                     ],
                     "routeConfiguration": {
                       "@odata.type": "#Microsoft.Azure.FrontDoor.Models.FrontdoorRedirectConfiguration",
-                      "redirectProtocoll": "HttpsOnly",
+                      "redirectProtocol": "HttpsOnly",
                       "redirectType": "Found"
                       
                     },
